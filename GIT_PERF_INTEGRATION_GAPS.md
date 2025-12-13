@@ -131,7 +131,126 @@ Update tutorial to use `release` parameter instead of `version`:
 
 ---
 
-### 3. **GAP: Unclear Output Expectations for `git perf report`**
+### 3. **CRITICAL: Report Action Fails Without Pre-Configured GitHub Pages**
+
+**Location:** Step 4: Set Up Automatic Reporting
+
+**Issue:** The report generation action (`kaihowl/git-perf/.github/actions/report@master`) fails when GitHub Pages is not already configured.
+
+**Error Message:**
+```
+pages_url=$(gh api repos/kaihowl/Test-git-perf/pages --jq '.html_url')
+gh: Not Found (HTTP 404)
+##[error]Process completed with exit code 1.
+```
+
+**Problem:**
+- The report action tries to fetch GitHub Pages URL using `gh api repos/.../pages`
+- This API endpoint returns 404 if GitHub Pages has never been enabled for the repository
+- The tutorial instructs users to add the report action in Step 4, but doesn't enable GitHub Pages until AFTER the first workflow run
+- **This creates a chicken-and-egg problem**: workflow fails because Pages isn't set up, but Pages branch won't be created until workflow succeeds
+
+**Root Cause:**
+The report action's script attempts to construct the full report URL by querying the GitHub Pages API endpoint. If GitHub Pages has never been enabled (even if the `gh-pages` branch exists), this API call fails with 404.
+
+**Impact:**
+- 100% failure rate for new repository integrations
+- The workflow will fail at the "Generate performance report with audit" step
+- Users following the tutorial step-by-step will hit this blocker
+
+**Solution Options:**
+
+**Option 1: Enable GitHub Pages Before First Workflow Run (Recommended)**
+
+Modify Step 4 in the tutorial to enable GitHub Pages BEFORE adding the report step:
+
+```markdown
+### Step 4A: Pre-configure GitHub Pages
+
+Before adding the report generation workflow, manually enable GitHub Pages:
+
+1. Go to repository Settings → Pages
+2. Under "Source", select "Deploy from a branch"
+3. Create an empty `gh-pages` branch:
+   ```bash
+   git checkout --orphan gh-pages
+   git reset --hard
+   git commit --allow-empty -m "Initialize gh-pages"
+   git push origin gh-pages
+   ```
+4. In Settings → Pages, select `gh-pages` branch and `/ (root)` folder
+5. Click "Save"
+6. Wait for the initial deployment to complete
+
+### Step 4B: Add Report Generation Workflow
+
+Now proceed with adding the report action to your workflow...
+```
+
+**Option 2: Make Report Action Optional for First Run**
+
+Modify the workflow to skip report generation if Pages isn't set up:
+
+```yaml
+- name: Check if GitHub Pages exists
+  id: check-pages
+  run: |
+    if gh api repos/${{ github.repository }}/pages &>/dev/null; then
+      echo "pages-enabled=true" >> $GITHUB_OUTPUT
+    else
+      echo "pages-enabled=false" >> $GITHUB_OUTPUT
+      echo "::warning::GitHub Pages not yet configured - skipping report"
+    fi
+  env:
+    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+- name: Generate performance report with audit
+  if: steps.check-pages.outputs.pages-enabled == 'true'
+  uses: kaihowl/git-perf/.github/actions/report@master
+  with:
+    depth: 40
+    audit-args: '-m build_time -m test_duration'
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+```
+
+**Option 3: Use Continue-on-Error (Not Recommended)**
+
+Allow the step to fail without failing the workflow:
+
+```yaml
+- name: Generate performance report with audit
+  continue-on-error: true  # Allow failure on first run
+  uses: kaihowl/git-perf/.github/actions/report@master
+  with:
+    depth: 40
+    audit-args: '-m build_time -m test_duration'
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+```
+
+**Recommended Fix for Tutorial:**
+
+The tutorial should be restructured as follows:
+
+1. **Step 3**: Set up basic measurement workflow (WITHOUT report generation)
+2. **Step 4**: Enable GitHub Pages manually with empty branch
+3. **Step 5**: Add report generation to workflow (now that Pages exists)
+4. **Step 6**: Configure cleanup
+5. **Step 7**: Enable audit
+
+**Alternative:** The report action itself should be fixed to handle the 404 gracefully and either:
+- Skip reporting with a warning on first run
+- Create the Pages configuration automatically via API if permissions allow
+- Provide a clear error message guiding users to enable Pages
+
+**Severity:** CRITICAL - Blocks successful workflow completion on new repositories
+
+**Workaround for Immediate Use:**
+
+Use Option 2 (conditional execution) until GitHub Pages is manually configured, then remove the condition.
+
+---
+
+### 4. **GAP: Unclear Output Expectations for `git perf report`**
 
 **Location:** Step 2: Add Initial Measurements
 
@@ -591,24 +710,29 @@ Despite the gaps identified, the tutorial has many strengths:
    - **Impact:** Causes warnings and confusion
    - **Action:** Change `version:` to `release:` in all examples
 
+3. **Fix GitHub Pages chicken-and-egg problem** (CRITICAL #3)
+   - **Impact:** Report generation fails on all new repositories
+   - **Action:** Either enable Pages before first run, or make report step conditional
+   - **Root cause:** Report action queries Pages API which returns 404 if not configured
+
 ### High Priority Fixes
 
-3. **Clarify `git perf report` output expectations** (GAP #3)
-4. **Add language-specific workflow examples** (GAP #4)
-5. **Include validation steps** for each major step (GAP #8)
-6. **Expand troubleshooting section** with common errors (PROBLEM #9)
+4. **Clarify `git perf report` output expectations** (GAP #4)
+5. **Add language-specific workflow examples** (GAP #5)
+6. **Include validation steps** for each major step (GAP #9)
+7. **Expand troubleshooting section** with common errors (PROBLEM #10)
 
 ### Medium Priority Improvements
 
-7. **Add Git version check/upgrade instructions** (PROBLEM #5)
-8. **Detail GitHub Pages setup process** (GAP #6)
-9. **Explain concurrency control** necessity (GAP #7)
-10. **Add testing best practices** section (GAP #10)
+8. **Add Git version check/upgrade instructions** (PROBLEM #6)
+9. **Detail GitHub Pages setup process** (GAP #7)
+10. **Explain concurrency control** necessity (GAP #8)
+11. **Add testing best practices** section (GAP #11)
 
 ### Low Priority Enhancements
 
-11. **Mention data format versioning** (GAP #11)
-12. **Show complete end-to-end example** (GAP #12)
+12. **Mention data format versioning** (GAP #12)
+13. **Show complete end-to-end example** (GAP #13)
 
 ---
 
@@ -663,11 +787,12 @@ All configuration followed the tutorial structure with language-specific adaptat
 
 ## Conclusion
 
-The Git-perf Integration Tutorial is comprehensive and well-written, but **has two critical issues that prevent successful GitHub Actions integration**:
+The Git-perf Integration Tutorial is comprehensive and well-written, but **has three critical issues that prevent successful GitHub Actions integration**:
 
 ### Critical Blockers
 1. **Missing git identity configuration** - Causes 100% failure rate in CI/CD
 2. **Incorrect action parameter name** - Tutorial uses `version:` but should use `release:`
+3. **GitHub Pages chicken-and-egg problem** - Report action fails because Pages API doesn't exist until Pages is manually enabled
 
 ### Other Improvements Needed
 - More explicit output expectations
@@ -675,7 +800,7 @@ The Git-perf Integration Tutorial is comprehensive and well-written, but **has t
 - Enhanced validation and troubleshooting guidance
 - Testing best practices
 
-**The core tool works excellently** when properly configured. The tutorial is well-structured with good progression from simple to complex topics. However, the two critical issues above make it **impossible to successfully follow the tutorial as written** for GitHub Actions integration.
+**The core tool works excellently** when properly configured. The tutorial is well-structured with good progression from simple to complex topics. However, the three critical issues above make it **impossible to successfully follow the tutorial as written** for GitHub Actions integration.
 
 ### Impact Assessment
 - **Without fixes:** New users will experience immediate failures when running workflows
@@ -695,10 +820,11 @@ The Git-perf Integration Tutorial is comprehensive and well-written, but **has t
 - ✅ Step 6: Enable regression detection - **COMPLETED**
 
 ### CI/CD Testing
-- ❌ Initial workflow run - **FAILED** (git identity missing, wrong parameter name)
-- ✅ Fixed workflow - **PENDING** (fixes committed, awaiting re-run)
-- ⏭️ GitHub Pages setup - **NOT TESTED** (requires successful workflow run)
-- ⏭️ End-to-end workflow - **PENDING** (awaiting CI success)
+- ❌ Initial workflow run #1 - **FAILED** (git identity missing, wrong parameter name)
+- ❌ Fixed workflow run #2 - **FAILED** (GitHub Pages not configured, report action fails with 404)
+- ✅ Final fixed workflow - **PENDING** (conditional Pages check added, awaiting re-run)
+- ⏭️ GitHub Pages setup - **NOT TESTED** (requires manual configuration in repository settings)
+- ⏭️ Full end-to-end workflow with reports - **BLOCKED** (requires Pages to be enabled first)
 
 ### Verification Method
 All issues were discovered through:

@@ -58,8 +58,23 @@ jobs:
       - name: Push measurements
         run: git perf push
 
-      # Generate performance report with audit
+      # Check if GitHub Pages is configured
+      - name: Check if GitHub Pages exists
+        id: check-pages
+        run: |
+          if gh api repos/${{ github.repository }}/pages &>/dev/null; then
+            echo "pages-enabled=true" >> $GITHUB_OUTPUT
+          else
+            echo "pages-enabled=false" >> $GITHUB_OUTPUT
+            echo "::warning::GitHub Pages not yet configured - skipping report generation"
+            echo "::warning::To enable reports, configure GitHub Pages in repository settings"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Generate performance report with audit (only if Pages is configured)
       - name: Generate performance report with audit
+        if: steps.check-pages.outputs.pages-enabled == 'true'
         uses: kaihowl/git-perf/.github/actions/report@master
         with:
           depth: 40
