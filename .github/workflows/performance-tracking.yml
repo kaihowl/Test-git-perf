@@ -1,0 +1,61 @@
+name: Performance Tracking
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  measure-and-report:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      pull-requests: write  # Required for PR comments
+    concurrency:
+      group: gh-pages-${{ github.ref }}
+      cancel-in-progress: false  # Let jobs queue to prevent conflicts
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for git-perf
+
+      # Install git-perf
+      - name: Install git-perf
+        uses: kaihowl/git-perf/.github/actions/install@master
+        with:
+          version: latest
+
+      # Set up Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm ci
+
+      # Example: Measure build time using the measure command
+      - name: Build project and measure
+        run: |
+          git perf measure -m build_time -- npm run build
+
+      # Example: Measure test duration
+      - name: Run tests and measure
+        run: |
+          git perf measure -m test_duration -- npm test
+
+      # Push measurements back to the repository
+      - name: Push measurements
+        run: git perf push
+
+      # Generate performance report with audit
+      - name: Generate performance report with audit
+        uses: kaihowl/git-perf/.github/actions/report@master
+        with:
+          depth: 40
+          audit-args: '-m build_time -m test_duration -d 4.0 --min-measurements 5'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
