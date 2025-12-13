@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+</head>
+
+<body>
+    <div>
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+        <script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
+        <div id="plotly-html-element" class="plotly-graph-div" style="height:100%; width:100%;"></div>
+
+        <script type="module">
+            const graph_div = document.getElementById("plotly-html-element");
+            await Plotly.newPlot(graph_div, {
+  "data": [
+    {
+      "type": "box",
+      "x": [
+        1
+      ],
+      "y": [
+        42.5
+      ],
+      "name": "build_time"
+    }
+  ],
+  "layout": {
+    "title": {
+      "text": "Performance Measurements"
+    },
+    "legend": {
+      "orientation": "h",
+      "groupclick": "toggleitem"
+    },
+    "xaxis": {
+      "tickvals": [
+        0.0,
+        1.0
+      ],
+      "ticktext": [
+        "a6d4ee",
+        "72f939"
+      ],
+      "tickfont": {
+        "family": "monospace"
+      },
+      "tickangle": 45.0
+    }
+  },
+  "config": {
+    "fillFrame": true,
+    "responsive": true
+  }
+});
+        </script>
+    </div>
+</body>
+
+</html>
