@@ -14,7 +14,124 @@ This document records all gaps, problems, and areas for improvement discovered w
 
 ## Gaps and Problems Identified
 
-### 1. **GAP: Unclear Output Expectations for `git perf report`**
+### 1. **CRITICAL: Missing Git Identity Configuration in GitHub Actions**
+
+**Location:** Step 3: Configure GitHub Actions
+
+**Issue:** The tutorial workflow fails when `git perf measure` or `git perf add` tries to commit measurements to git-notes.
+
+**Error Message:**
+```
+Error: Permanent failure while adding note line to head
+
+Caused by:
+    Git failed to execute.
+
+    stderr:
+    Author identity unknown
+
+    *** Please tell me who you are.
+
+    Run
+
+      git config --global user.email "you@example.com"
+      git config --global user.name "Your Name"
+
+    fatal: empty ident name not allowed
+```
+
+**Problem:**
+- GitHub Actions runners don't have git identity configured by default
+- git-perf commits measurements as git-notes, which requires git user/email
+- The tutorial provides no guidance on configuring git identity
+- **This causes 100% failure rate for new integrations**
+
+**Root Cause:**
+Git-perf uses `git notes add` internally, which creates git commits. Git requires user identity for all commits.
+
+**Solution Required:**
+Add git identity configuration step BEFORE any git-perf measurement commands:
+
+```yaml
+# Configure git identity for measurements
+- name: Configure git identity
+  run: |
+    git config --global user.email "actions@github.com"
+    git config --global user.name "GitHub Actions"
+```
+
+**Recommended Fix for Tutorial:**
+Add this as a required step in Step 3, immediately after the git-perf installation step. Include a clear explanation:
+
+```markdown
+### Configure Git Identity
+
+**Important:** Git-perf stores measurements as git-notes (git commits), which require
+a configured git identity. Add this step before any measurement commands:
+
+\`\`\`yaml
+- name: Configure git identity
+  run: |
+    git config --global user.email "actions@github.com"
+    git config --global user.name "GitHub Actions"
+\`\`\`
+
+Without this step, you'll see "Author identity unknown" errors.
+```
+
+**Severity:** CRITICAL - Prevents any measurements from being recorded in CI/CD
+
+**Verification:** This issue was discovered by running the workflow in actual GitHub Actions and analyzing the failure logs.
+
+---
+
+### 2. **CRITICAL: Wrong Parameter Name in Install Action**
+
+**Location:** Step 3: Configure GitHub Actions
+
+**Issue:** The tutorial example uses incorrect parameter name for the install action.
+
+**Tutorial Shows:**
+```yaml
+- name: Install git-perf
+  uses: kaihowl/git-perf/.github/actions/install@master
+  with:
+    version: latest  # ❌ WRONG
+```
+
+**Actual Parameter:**
+```yaml
+- name: Install git-perf
+  uses: kaihowl/git-perf/.github/actions/install@master
+  with:
+    release: latest  # ✅ CORRECT
+```
+
+**Error Message:**
+```
+! Unexpected input(s) 'version', valid inputs are ['release']
+```
+
+**Problem:**
+- Tutorial documentation doesn't match the actual action implementation
+- Users copying the example get a warning (though it may still work with defaults)
+- Inconsistency between docs and implementation
+
+**Solution:**
+Update tutorial to use `release` parameter instead of `version`:
+
+```yaml
+- name: Install git-perf
+  uses: kaihowl/git-perf/.github/actions/install@master
+  with:
+    release: latest  # Use 'release', not 'version'
+```
+
+**Severity:** HIGH - Causes confusion and workflow warnings
+
+---
+
+### 3. **GAP: Unclear Output Expectations for `git perf report`**
 
 **Location:** Step 2: Add Initial Measurements
 
@@ -47,7 +164,7 @@ Or mention: "Note: The report command generates an HTML file. Use `-o <filename>
 
 ---
 
-### 2. **GAP: Missing Language-Specific Examples**
+### 4. **GAP: Missing Language-Specific Examples**
 
 **Location:** Step 3: Configure GitHub Actions
 
@@ -117,7 +234,7 @@ Add a "Language-Specific Examples" section with common patterns:
 
 ---
 
-### 3. **PROBLEM: Git Version Requirement Not Validated**
+### 5. **PROBLEM: Git Version Requirement Not Validated**
 
 **Location:** Prerequisites section
 
@@ -148,7 +265,7 @@ brew upgrade git
 
 ---
 
-### 4. **GAP: No Guidance on GitHub Pages Setup Details**
+### 6. **GAP: No Guidance on GitHub Pages Setup Details**
 
 **Location:** Step 4: Set Up Automatic Reporting → Enable GitHub Pages
 
@@ -194,7 +311,7 @@ Add troubleshooting section:
 
 ---
 
-### 5. **GAP: Concurrency Control Not Explained**
+### 7. **GAP: Concurrency Control Not Explained**
 
 **Location:** Step 4: Set Up Automatic Reporting
 
@@ -232,7 +349,7 @@ Without this, you may see errors like:
 
 ---
 
-### 6. **GAP: Missing Validation Steps**
+### 8. **GAP: Missing Validation Steps**
 
 **Location:** Throughout the tutorial
 
@@ -268,7 +385,7 @@ Add "Verification" subsections to each step showing how to confirm success.
 
 ---
 
-### 7. **PROBLEM: Insufficient Error Handling Guidance**
+### 9. **PROBLEM: Insufficient Error Handling Guidance**
 
 **Location:** Troubleshooting section
 
@@ -327,7 +444,7 @@ git fetch --unshallow
 
 ---
 
-### 8. **GAP: No Mention of Testing Before Production Use**
+### 10. **GAP: No Mention of Testing Before Production Use**
 
 **Location:** Throughout the tutorial
 
@@ -369,7 +486,7 @@ Add a "Best Practices" section at the beginning:
 
 ---
 
-### 9. **GAP: Missing Information About Data Migration**
+### 11. **GAP: Missing Information About Data Migration**
 
 **Location:** Mentioned briefly in main README but not in tutorial
 
@@ -400,7 +517,7 @@ Git-perf stores measurements in versioned git-notes (currently v3).
 
 ---
 
-### 10. **GAP: No Example of Complete End-to-End Flow**
+### 12. **GAP: No Example of Complete End-to-End Flow**
 
 **Location:** End of tutorial
 
@@ -464,24 +581,34 @@ Despite the gaps identified, the tutorial has many strengths:
 
 ## Summary of Recommendations
 
+### CRITICAL FIXES (Must Address - Breaking Issues)
+
+1. **Add git identity configuration step** (CRITICAL #1)
+   - **Impact:** 100% failure rate without this
+   - **Action:** Add git config step immediately after install in tutorial
+
+2. **Fix install action parameter name** (CRITICAL #2)
+   - **Impact:** Causes warnings and confusion
+   - **Action:** Change `version:` to `release:` in all examples
+
 ### High Priority Fixes
 
-1. **Clarify `git perf report` output expectations** (GAP #1)
-2. **Add language-specific workflow examples** (GAP #2)
-3. **Include validation steps** for each major step (GAP #6)
-4. **Expand troubleshooting section** with common errors (GAP #7)
+3. **Clarify `git perf report` output expectations** (GAP #3)
+4. **Add language-specific workflow examples** (GAP #4)
+5. **Include validation steps** for each major step (GAP #8)
+6. **Expand troubleshooting section** with common errors (PROBLEM #9)
 
 ### Medium Priority Improvements
 
-5. **Add Git version check/upgrade instructions** (PROBLEM #3)
-6. **Detail GitHub Pages setup process** (GAP #4)
-7. **Explain concurrency control** necessity (GAP #5)
-8. **Add testing best practices** section (GAP #8)
+7. **Add Git version check/upgrade instructions** (PROBLEM #5)
+8. **Detail GitHub Pages setup process** (GAP #6)
+9. **Explain concurrency control** necessity (GAP #7)
+10. **Add testing best practices** section (GAP #10)
 
 ### Low Priority Enhancements
 
-9. **Mention data format versioning** (GAP #9)
-10. **Show complete end-to-end example** (GAP #10)
+11. **Mention data format versioning** (GAP #11)
+12. **Show complete end-to-end example** (GAP #12)
 
 ---
 
@@ -536,26 +663,49 @@ All configuration followed the tutorial structure with language-specific adaptat
 
 ## Conclusion
 
-The Git-perf Integration Tutorial is comprehensive and well-written, but would benefit from:
+The Git-perf Integration Tutorial is comprehensive and well-written, but **has two critical issues that prevent successful GitHub Actions integration**:
+
+### Critical Blockers
+1. **Missing git identity configuration** - Causes 100% failure rate in CI/CD
+2. **Incorrect action parameter name** - Tutorial uses `version:` but should use `release:`
+
+### Other Improvements Needed
 - More explicit output expectations
-- Multi-language examples
+- Multi-language examples (currently Rust-only)
 - Enhanced validation and troubleshooting guidance
 - Testing best practices
 
-The core integration process is sound and the tool works as documented. With the above improvements, the tutorial would be even more accessible to users across different technology stacks.
+**The core tool works excellently** when properly configured. The tutorial is well-structured with good progression from simple to complex topics. However, the two critical issues above make it **impossible to successfully follow the tutorial as written** for GitHub Actions integration.
+
+### Impact Assessment
+- **Without fixes:** New users will experience immediate failures when running workflows
+- **With fixes:** Integration should work smoothly for all language ecosystems
+- **Documentation quality:** Generally high, but needs alignment with actual action implementation
 
 ---
 
 ## Testing Status
 
+### Local Testing
 - ✅ Step 1: Install git-perf locally - **COMPLETED**
 - ✅ Step 2: Add initial measurements - **COMPLETED** (with output clarity issue noted)
 - ✅ Step 3: Configure GitHub Actions - **COMPLETED** (adapted for Node.js)
 - ✅ Step 4: Set up automatic reporting - **COMPLETED**
 - ✅ Step 5: Configure measurement cleanup - **COMPLETED**
 - ✅ Step 6: Enable regression detection - **COMPLETED**
-- ⏭️ GitHub Pages setup - **NOT TESTED** (requires workflow run and repository settings access)
-- ⏭️ End-to-end workflow - **NOT TESTED** (requires pushing to remote and GitHub Actions execution)
+
+### CI/CD Testing
+- ❌ Initial workflow run - **FAILED** (git identity missing, wrong parameter name)
+- ✅ Fixed workflow - **PENDING** (fixes committed, awaiting re-run)
+- ⏭️ GitHub Pages setup - **NOT TESTED** (requires successful workflow run)
+- ⏭️ End-to-end workflow - **PENDING** (awaiting CI success)
+
+### Verification Method
+All issues were discovered through:
+1. Following the tutorial step-by-step
+2. Running the actual GitHub Actions workflow
+3. Analyzing failure logs from gh CLI
+4. Testing fixes locally before committing
 
 ---
 
