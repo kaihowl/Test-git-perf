@@ -1,0 +1,63 @@
+name: Performance Reporting
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  measure-and-report:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      pull-requests: write  # Required for PR comments
+
+    # Concurrency control prevents race conditions when multiple workflows
+    # try to update the gh-pages branch simultaneously. Without this, you may
+    # encounter "failed to push" errors or lost reports when multiple PRs or
+    # commits trigger the workflow at the same time.
+    concurrency:
+      group: gh-pages-${{ github.ref }}      # One deployment per branch at a time
+      cancel-in-progress: false              # Queue jobs instead of canceling
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Setup Node.js environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install git-perf
+        uses: kaihowl/git-perf/.github/actions/install@master
+        with:
+          release: latest
+
+      - name: Configure git identity
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Build project and measure
+        run: git perf measure -m build_time -- npm run build
+
+      - name: Run tests and measure
+        run: git perf measure -m test_duration -- npm run test:unit
+
+      - name: Push measurements
+        run: git perf push
+
+      - name: Generate performance report
+        uses: kaihowl/git-perf/.github/actions/report@master
+        with:
+          depth: 40
+          github-token: ${{ secrets.GITHUB_TOKEN }}

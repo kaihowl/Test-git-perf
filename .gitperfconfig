@@ -1,8 +1,16 @@
+# Default settings for all measurements
 [measurement]
 min_relative_deviation = 5.0
 dispersion_method = "mad"
+unit = "ms"  # Default unit for all measurements
 
+# Measurement-specific settings
 [measurement."build_time"]
+min_relative_deviation = 10.0
+dispersion_method = "mad"
+unit = "seconds"  # Build time in seconds
+
+[measurement."test_duration"]
 unit = "ms"
 
 [measurement."test::*"]

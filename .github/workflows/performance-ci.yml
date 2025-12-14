@@ -1,0 +1,58 @@
+name: Performance CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly reports
+
+jobs:
+  measure-and-report:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      pull-requests: write
+    concurrency:
+      group: gh-pages-${{ github.ref }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Setup Node.js environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - uses: kaihowl/git-perf/.github/actions/install@master
+
+      - name: Configure git identity
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Build and measure
+        run: |
+          git perf measure -m build_time -- npm run build
+
+      - name: Test and measure
+        run: git perf measure -m test_duration -- npm run test:unit
+
+      - name: Push measurements
+        run: git perf push
+
+      - name: Generate report with audit
+        uses: kaihowl/git-perf/.github/actions/report@master
+        with:
+          depth: 40
+          audit-args: '-m build_time -m test_duration -d 4.0 --min-measurements 5'
+          github-token: ${{ secrets.GITHUB_TOKEN }}

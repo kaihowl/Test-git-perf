@@ -1,0 +1,54 @@
+name: Performance Tracking
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  measure-performance:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Required to push measurements
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for git-perf
+
+      # Install dependencies
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Install git-perf
+      - name: Install git-perf
+        uses: kaihowl/git-perf/.github/actions/install@master
+        with:
+          release: latest
+
+      # Configure git identity (required for git-perf to commit measurements)
+      - name: Configure git identity
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+      # Measure build time using the measure command
+      - name: Build project and measure
+        run: |
+          git perf measure -m build_time -- npm run build
+
+      # Measure test duration
+      - name: Run tests and measure
+        run: |
+          git perf measure -m test_duration -- npm run test:unit
+
+      # Push measurements back to the repository
+      - name: Push measurements
+        run: git perf push
