@@ -1,0 +1,9 @@
+[measurement]
+min_relative_deviation = 5.0
+dispersion_method = "mad"
+
+[measurement."build_time"]
+unit = "ms"
+
+[measurement."test::*"]
+unit = "ms"

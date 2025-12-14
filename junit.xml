@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="30" failures="0" errors="0" time="3.376">
+  <testsuite name="Array Utils" errors="0" failures="0" skipped="0" timestamp="2025-12-14T09:24:54" time="2.78" tests="16">
+    <testcase classname="Array Utils chunk chunks array into specified size" name="Array Utils chunk chunks array into specified size" time="0.004">
+    </testcase>
+    <testcase classname="Array Utils chunk handles empty array" name="Array Utils chunk handles empty array" time="0.001">
+    </testcase>
+    <testcase classname="Array Utils chunk handles chunk size larger than array" name="Array Utils chunk handles chunk size larger than array" time="0.001">
+    </testcase>
+    <testcase classname="Array Utils unique removes duplicates from array" name="Array Utils unique removes duplicates from array" time="0.001">
+    </testcase>
+    <testcase classname="Array Utils unique handles array with no duplicates" name="Array Utils unique handles array with no duplicates" time="0.001">
+    </testcase>
+    <testcase classname="Array Utils unique handles empty array" name="Array Utils unique handles empty array" time="0">
+    </testcase>
+    <testcase classname="Array Utils flatten flattens nested arrays" name="Array Utils flatten flattens nested arrays" time="0">
+    </testcase>
+    <testcase classname="Array Utils flatten handles empty arrays" name="Array Utils flatten handles empty arrays" time="0">
+    </testcase>
+    <testcase classname="Array Utils sum calculates sum of numbers" name="Array Utils sum calculates sum of numbers" time="0.001">
+    </testcase>
+    <testcase classname="Array Utils sum handles empty array" name="Array Utils sum handles empty array" time="0">
+    </testcase>
+    <testcase classname="Array Utils sum handles negative numbers" name="Array Utils sum handles negative numbers" time="0.001">
+    </testcase>
+    <testcase classname="Array Utils average calculates average of numbers" name="Array Utils average calculates average of numbers" time="0">
+    </testcase>
+    <testcase classname="Array Utils average handles empty array" name="Array Utils average handles empty array" time="0.001">
+    </testcase>
+    <testcase classname="Array Utils sortNumbers sorts numbers in ascending order" name="Array Utils sortNumbers sorts numbers in ascending order" time="0">
+    </testcase>
+    <testcase classname="Array Utils sortNumbers sorts numbers in descending order" name="Array Utils sortNumbers sorts numbers in descending order" time="0">
+    </testcase>
+    <testcase classname="Array Utils sortNumbers handles empty array" name="Array Utils sortNumbers handles empty array" time="0">
+    </testcase>
+  </testsuite>
+  <testsuite name="String Utils" errors="0" failures="0" skipped="0" timestamp="2025-12-14T09:24:57" time="0.158" tests="14">
+    <testcase classname="String Utils capitalize capitalizes first letter of string" name="String Utils capitalize capitalizes first letter of string" time="0.001">
+    </testcase>
+    <testcase classname="String Utils capitalize handles already capitalized string" name="String Utils capitalize handles already capitalized string" time="0.001">
+    </testcase>
+    <testcase classname="String Utils capitalize handles empty string" name="String Utils capitalize handles empty string" time="0">
+    </testcase>
+    <testcase classname="String Utils capitalize handles single character" name="String Utils capitalize handles single character" time="0">
+    </testcase>
+    <testcase classname="String Utils reverseString reverses a simple string" name="String Utils reverseString reverses a simple string" time="0">
+    </testcase>
+    <testcase classname="String Utils reverseString handles palindrome" name="String Utils reverseString handles palindrome" time="0">
+    </testcase>
+    <testcase classname="String Utils reverseString handles empty string" name="String Utils reverseString handles empty string" time="0.001">
+    </testcase>
+    <testcase classname="String Utils isPalindrome identifies simple palindrome" name="String Utils isPalindrome identifies simple palindrome" time="0">
+    </testcase>
+    <testcase classname="String Utils isPalindrome identifies palindrome with spaces" name="String Utils isPalindrome identifies palindrome with spaces" time="0.001">
+    </testcase>
+    <testcase classname="String Utils isPalindrome identifies non-palindrome" name="String Utils isPalindrome identifies non-palindrome" time="0">
+    </testcase>
+    <testcase classname="String Utils isPalindrome handles empty string" name="String Utils isPalindrome handles empty string" time="0.001">
+    </testcase>
+    <testcase classname="String Utils truncate truncates long string" name="String Utils truncate truncates long string" time="0">
+    </testcase>
+    <testcase classname="String Utils truncate does not truncate short string" name="String Utils truncate does not truncate short string" time="0">
+    </testcase>
+    <testcase classname="String Utils truncate handles exact length match" name="String Utils truncate handles exact length match" time="0.001">
+    </testcase>
+  </testsuite>
+</testsuites>
