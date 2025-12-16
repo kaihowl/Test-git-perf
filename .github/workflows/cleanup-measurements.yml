@@ -1,0 +1,42 @@
+name: Cleanup Old Measurements
+
+on:
+  schedule:
+    - cron: '0 2 * * 0'  # Weekly on Sunday at 2 AM
+  workflow_dispatch:  # Allow manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install git-perf
+        run: |
+          curl --proto '=https' --tlsv1.2 -LsSf https://github.com/kaihowl/git-perf/releases/latest/download/git-perf-installer.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Configure Git identity
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+      - name: Pull latest measurements
+        run: git perf pull
+
+      - name: Remove measurements older than 90 days
+        run: |
+          CUTOFF_DATE=$(date -d '90 days ago' -Iseconds)
+          git perf remove --before "$CUTOFF_DATE"
+
+      - name: Prune unreachable measurements
+        run: git perf prune
+
+      - name: Push cleaned measurements
+        run: git perf push

@@ -5,5 +5,10 @@ epoch = "00000000"
 
 [measurement."build_time"]
 min_relative_deviation = 10.0
-unit = "ms"
+unit = "seconds"
 epoch = "305419896"
+
+[measurement."test_duration"]
+min_relative_deviation = 15.0
+unit = "seconds"
+dispersion_method = "mad"

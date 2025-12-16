@@ -1,0 +1,76 @@
+name: Performance Reporting
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday at midnight
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install git-perf
+        run: |
+          curl --proto '=https' --tlsv1.2 -LsSf https://github.com/kaihowl/git-perf/releases/latest/download/git-perf-installer.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Configure Git identity
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+      - name: Pull latest measurements
+        run: git perf pull
+
+      - name: Generate HTML reports
+        run: |
+          mkdir -p reports
+          git perf report -m build_time -o reports/build_time.html
+          git perf report -m test_duration -o reports/test_duration.html
+
+      - name: Create index page
+        run: |
+          cat > reports/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Performance Dashboard</title>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 40px; }
+              h1 { color: #333; }
+              .links { margin: 20px 0; }
+              .links a { display: block; margin: 10px 0; padding: 10px; background: #f0f0f0; text-decoration: none; color: #0066cc; border-radius: 4px; }
+              .links a:hover { background: #e0e0e0; }
+            </style>
+          </head>
+          <body>
+            <h1>Performance Dashboard</h1>
+            <div class="links">
+              <a href="build_time.html">Build Time Performance</a>
+              <a href="test_duration.html">Test Duration Performance</a>
+            </div>
+          </body>
+          </html>
+          EOF
+
+      - name: Upload to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: reports
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
