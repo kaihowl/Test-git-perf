@@ -1,0 +1,9 @@
+[measurement]
+min_relative_deviation = 5.0
+dispersion_method = "mad"
+epoch = "00000000"
+
+[measurement."build_time"]
+min_relative_deviation = 10.0
+unit = "ms"
+epoch = "305419896"
