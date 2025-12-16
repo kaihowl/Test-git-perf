@@ -1,0 +1,26 @@
+# git-perf configuration for demo-utils project
+# See: https://github.com/kaihowl/git-perf
+
+# Default settings for all measurements
+[measurement]
+min_relative_deviation = 10.0  # Percentage (0..100)
+dispersion_method = "mad"      # Use MAD (more robust to outliers)
+unit = "ms"                    # Default unit for display
+
+# Test duration - measures performance test suite execution time
+[measurement."test_duration"]
+min_relative_deviation = 15.0  # Tests can vary more
+dispersion_method = "mad"
+unit = "seconds"
+
+# Build time - measures TypeScript compilation time
+[measurement."build_time"]
+min_relative_deviation = 20.0  # Build times can vary significantly
+dispersion_method = "mad"
+unit = "seconds"
+
+# Distribution size - measures the size of compiled output
+[measurement."dist_size"]
+min_relative_deviation = 5.0   # Size should be more stable
+dispersion_method = "stddev"
+unit = "bytes"

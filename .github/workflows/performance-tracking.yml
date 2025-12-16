@@ -1,0 +1,75 @@
+name: Performance Tracking
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  measure-and-report:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write      # Required to push measurements
+      pages: write        # Required for GitHub Pages deployment
+      pull-requests: write # Required for PR comments
+
+    # Concurrency control prevents race conditions when multiple workflows
+    # try to update the gh-pages branch simultaneously
+    concurrency:
+      group: gh-pages-${{ github.ref }}
+      cancel-in-progress: false  # Queue jobs instead of canceling
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for git-perf
+
+      # Install git-perf
+      - name: Install git-perf
+        uses: kaihowl/git-perf/.github/actions/install@master
+        with:
+          release: latest
+
+      # Configure git identity (required for git-perf to commit measurements)
+      - name: Configure git identity
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+      # Set up Node.js for building and testing
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm ci
+
+      # Measure build time
+      - name: Measure build time
+        run: git perf measure -m build_time -- npm run build
+
+      # Measure distribution size
+      - name: Measure distribution size
+        run: |
+          dist_size=$(du -b dist/ | awk 'END {print $1}')
+          git perf add "$dist_size" -m dist_size
+
+      # Measure test duration
+      - name: Measure test duration
+        run: git perf measure -m test_duration -- npm run test:perf
+
+      # Push measurements back to the repository
+      - name: Push measurements
+        run: git perf push
+
+      # Generate performance report with audit
+      - name: Generate performance report
+        uses: kaihowl/git-perf/.github/actions/report@master
+        with:
+          depth: 40
+          audit-args: '-m build_time -m dist_size -m test_duration -d 4.0 --min-measurements 3'
+          github-token: ${{ secrets.GITHUB_TOKEN }}

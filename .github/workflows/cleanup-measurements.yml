@@ -1,0 +1,25 @@
+name: Cleanup Old Measurements
+
+on:
+  schedule:
+    # Run weekly on Sundays at 2 AM UTC
+    - cron: '0 2 * * 0'
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Required to delete old measurements and reports
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history
+
+      - name: Cleanup measurements and reports
+        uses: kaihowl/git-perf/.github/actions/cleanup@master
+        with:
+          retention-days: 90          # Keep 90 days of measurement data
+          cleanup-reports: true       # Also cleanup old reports
+          reports-retention-days: 30  # Keep 30 days of reports
