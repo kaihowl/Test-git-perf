@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="44" failures="2" errors="0" time="4.82">
+  <testsuite name="Array Utils Performance Tests" errors="0" failures="1" skipped="0" timestamp="2025-12-16T06:50:08" time="3.684" tests="8">
+    <testcase classname="Array Utils Performance Tests chunk performance handles large array efficiently" name="Array Utils Performance Tests chunk performance handles large array efficiently" time="0.014">
+    </testcase>
+    <testcase classname="Array Utils Performance Tests unique performance removes duplicates from large array efficiently" name="Array Utils Performance Tests unique performance removes duplicates from large array efficiently" time="0.007">
+    </testcase>
+    <testcase classname="Array Utils Performance Tests unique performance handles array with many duplicates" name="Array Utils Performance Tests unique performance handles array with many duplicates" time="0.004">
+    </testcase>
+    <testcase classname="Array Utils Performance Tests flatten performance flattens large nested array efficiently" name="Array Utils Performance Tests flatten performance flattens large nested array efficiently" time="0.618">
+      <failure>Error: expect(received).toBeLessThan(expected)
+
+Expected: &lt; 500
+Received:   604.7820109999998
+    at Object.&lt;anonymous&gt; (/root/repo/tests/performance/array-performance.test.ts:52:24)
+    at Promise.then.completed (/root/repo/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/root/repo/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/root/repo/node_modules/jest-circus/build/run.js:316:40)
+    at _runTest (/root/repo/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/root/repo/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/root/repo/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/root/repo/node_modules/jest-circus/build/run.js:121:9)
+    at run (/root/repo/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/root/repo/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/root/repo/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/root/repo/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/root/repo/node_modules/jest-runner/build/runTest.js:444:34)</failure>
+    </testcase>
+    <testcase classname="Array Utils Performance Tests sum performance calculates sum of large array efficiently" name="Array Utils Performance Tests sum performance calculates sum of large array efficiently" time="0.113">
+    </testcase>
+    <testcase classname="Array Utils Performance Tests sortNumbers performance sorts large array efficiently" name="Array Utils Performance Tests sortNumbers performance sorts large array efficiently" time="0.054">
+    </testcase>
+    <testcase classname="Array Utils Performance Tests sortNumbers performance handles already sorted array" name="Array Utils Performance Tests sortNumbers performance handles already sorted array" time="0.008">
+    </testcase>
+    <testcase classname="Array Utils Performance Tests memory efficiency chunk does not cause memory issues with large datasets" name="Array Utils Performance Tests memory efficiency chunk does not cause memory issues with large datasets" time="0.095">
+    </testcase>
+  </testsuite>
+  <testsuite name="String Utils Performance Tests" errors="0" failures="1" skipped="0" timestamp="2025-12-16T06:50:12" time="0.387" tests="6">
+    <testcase classname="String Utils Performance Tests capitalize performance handles very long string efficiently" name="String Utils Performance Tests capitalize performance handles very long string efficiently" time="0.003">
+    </testcase>
+    <testcase classname="String Utils Performance Tests reverseString performance reverses long string efficiently" name="String Utils Performance Tests reverseString performance reverses long string efficiently" time="0.09">
+    </testcase>
+    <testcase classname="String Utils Performance Tests isPalindrome performance checks long palindrome efficiently" name="String Utils Performance Tests isPalindrome performance checks long palindrome efficiently" time="0.017">
+    </testcase>
+    <testcase classname="String Utils Performance Tests isPalindrome performance checks long non-palindrome efficiently" name="String Utils Performance Tests isPalindrome performance checks long non-palindrome efficiently" time="0.129">
+      <failure>Error: expect(received).toBeLessThan(expected)
+
+Expected: &lt; 100
+Received:   126.4906519999995
+    at Object.&lt;anonymous&gt; (/root/repo/tests/performance/string-performance.test.ts:51:24)
+    at Promise.then.completed (/root/repo/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/root/repo/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/root/repo/node_modules/jest-circus/build/run.js:316:40)
+    at _runTest (/root/repo/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/root/repo/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/root/repo/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/root/repo/node_modules/jest-circus/build/run.js:121:9)
+    at run (/root/repo/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/root/repo/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/root/repo/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/root/repo/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/root/repo/node_modules/jest-runner/build/runTest.js:444:34)</failure>
+    </testcase>
+    <testcase classname="String Utils Performance Tests truncate performance truncates very long string efficiently" name="String Utils Performance Tests truncate performance truncates very long string efficiently" time="0.003">
+    </testcase>
+    <testcase classname="String Utils Performance Tests truncate performance handles multiple truncations efficiently" name="String Utils Performance Tests truncate performance handles multiple truncations efficiently" time="0.038">
+    </testcase>
+  </testsuite>
+  <testsuite name="Array Utils" errors="0" failures="0" skipped="0" timestamp="2025-12-16T06:50:12" time="0.175" tests="16">
+    <testcase classname="Array Utils chunk chunks array into specified size" name="Array Utils chunk chunks array into specified size" time="0.002">
+    </testcase>
+    <testcase classname="Array Utils chunk handles empty array" name="Array Utils chunk handles empty array" time="0.001">
+    </testcase>
+    <testcase classname="Array Utils chunk handles chunk size larger than array" name="Array Utils chunk handles chunk size larger than array" time="0">
+    </testcase>
+    <testcase classname="Array Utils unique removes duplicates from array" name="Array Utils unique removes duplicates from array" time="0.009">
+    </testcase>
+    <testcase classname="Array Utils unique handles array with no duplicates" name="Array Utils unique handles array with no duplicates" time="0.001">
+    </testcase>
+    <testcase classname="Array Utils unique handles empty array" name="Array Utils unique handles empty array" time="0.001">
+    </testcase>
+    <testcase classname="Array Utils flatten flattens nested arrays" name="Array Utils flatten flattens nested arrays" time="0.001">
+    </testcase>
+    <testcase classname="Array Utils flatten handles empty arrays" name="Array Utils flatten handles empty arrays" time="0.001">
+    </testcase>
+    <testcase classname="Array Utils sum calculates sum of numbers" name="Array Utils sum calculates sum of numbers" time="0.001">
+    </testcase>
+    <testcase classname="Array Utils sum handles empty array" name="Array Utils sum handles empty array" time="0.001">
+    </testcase>
+    <testcase classname="Array Utils sum handles negative numbers" name="Array Utils sum handles negative numbers" time="0.009">
+    </testcase>
+    <testcase classname="Array Utils average calculates average of numbers" name="Array Utils average calculates average of numbers" time="0.001">
+    </testcase>
+    <testcase classname="Array Utils average handles empty array" name="Array Utils average handles empty array" time="0.001">
+    </testcase>
+    <testcase classname="Array Utils sortNumbers sorts numbers in ascending order" name="Array Utils sortNumbers sorts numbers in ascending order" time="0">
+    </testcase>
+    <testcase classname="Array Utils sortNumbers sorts numbers in descending order" name="Array Utils sortNumbers sorts numbers in descending order" time="0">
+    </testcase>
+    <testcase classname="Array Utils sortNumbers handles empty array" name="Array Utils sortNumbers handles empty array" time="0">
+    </testcase>
+  </testsuite>
+  <testsuite name="String Utils" errors="0" failures="0" skipped="0" timestamp="2025-12-16T06:50:13" time="0.087" tests="14">
+    <testcase classname="String Utils capitalize capitalizes first letter of string" name="String Utils capitalize capitalizes first letter of string" time="0.001">
+    </testcase>
+    <testcase classname="String Utils capitalize handles already capitalized string" name="String Utils capitalize handles already capitalized string" time="0">
+    </testcase>
+    <testcase classname="String Utils capitalize handles empty string" name="String Utils capitalize handles empty string" time="0">
+    </testcase>
+    <testcase classname="String Utils capitalize handles single character" name="String Utils capitalize handles single character" time="0.001">
+    </testcase>
+    <testcase classname="String Utils reverseString reverses a simple string" name="String Utils reverseString reverses a simple string" time="0.001">
+    </testcase>
+    <testcase classname="String Utils reverseString handles palindrome" name="String Utils reverseString handles palindrome" time="0">
+    </testcase>
+    <testcase classname="String Utils reverseString handles empty string" name="String Utils reverseString handles empty string" time="0">
+    </testcase>
+    <testcase classname="String Utils isPalindrome identifies simple palindrome" name="String Utils isPalindrome identifies simple palindrome" time="0.001">
+    </testcase>
+    <testcase classname="String Utils isPalindrome identifies palindrome with spaces" name="String Utils isPalindrome identifies palindrome with spaces" time="0.001">
+    </testcase>
+    <testcase classname="String Utils isPalindrome identifies non-palindrome" name="String Utils isPalindrome identifies non-palindrome" time="0">
+    </testcase>
+    <testcase classname="String Utils isPalindrome handles empty string" name="String Utils isPalindrome handles empty string" time="0">
+    </testcase>
+    <testcase classname="String Utils truncate truncates long string" name="String Utils truncate truncates long string" time="0.001">
+    </testcase>
+    <testcase classname="String Utils truncate does not truncate short string" name="String Utils truncate does not truncate short string" time="0.001">
+    </testcase>
+    <testcase classname="String Utils truncate handles exact length match" name="String Utils truncate handles exact length match" time="0">
+    </testcase>
+  </testsuite>
+</testsuites>
