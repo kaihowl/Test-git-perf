@@ -21,26 +21,25 @@ This document reports on the integration of git-perf into the demo-utils reposit
 
 ## Documentation Gaps and Issues
 
-### 1. Installation Script Not Available (CRITICAL)
-**Issue**: The tutorial references a shell installer at `https://raw.githubusercontent.com/kaihowl/git-perf/master/install.sh` which returns a 404 error.
+### 1. Installation Instructions Require External Navigation
+**Issue**: The tutorial defers to the README for installation instructions ("See the [Installation section in the README](../README.md#installation)") without providing inline examples.
 
 **Location in Guide**: Step 1 - "Install git-perf Locally"
 
 **What Happened**:
-```bash
-curl -fsSL https://raw.githubusercontent.com/kaihowl/git-perf/master/install.sh | sh
-# curl: (22) The requested URL returned error: 404
-```
+- The guide mentions "Shell installer (recommended)" but doesn't show the command
+- Users must navigate to the README to find actual installation instructions
+- This breaks the flow of following a step-by-step tutorial
 
-**Workaround Used**:
+**What I Did**:
 - Manually downloaded pre-built binary from GitHub Releases
 - Found the binary at: `https://github.com/kaihowl/git-perf/releases/download/git-perf-v0.18.0/git-perf-x86_64-unknown-linux-gnu.tar.xz`
 - Extracted and moved to `/usr/local/bin/`
 
 **Recommendation**:
-- Either create the missing `install.sh` script, or
-- Update the tutorial to show the manual binary installation process as the primary method
-- Add a troubleshooting section for the 404 error with the workaround
+- Include at least one complete installation example inline in the integration tutorial
+- Show the most common method (e.g., downloading pre-built binaries) with actual commands
+- Keep the README reference for alternative methods, but don't require navigation for the happy path
 
 ### 2. Missing Node.js/Language-Specific Setup Guidance
 **Issue**: The tutorial assumes a Rust/Cargo project but doesn't provide examples for other languages like Node.js, Python, Java, etc.
@@ -222,7 +221,7 @@ But the GitHub release is tagged `git-perf-v0.18.0`.
 **Guide Completeness**: 8/10
 
 The integration guide is comprehensive and well-structured. The main gaps are:
-1. Broken installation script (critical)
+1. Installation requires external navigation (breaks tutorial flow)
 2. Missing language-specific examples
 3. Unclear guidance on metric selection
 
@@ -240,7 +239,7 @@ The documentation is well-written, detailed, and includes good troubleshooting g
 ## Recommendations for Documentation Improvement
 
 ### High Priority
-1. ✅ Fix or replace the broken `install.sh` script reference
+1. ✅ Add inline installation example to integration tutorial (avoid requiring README navigation)
 2. ✅ Add Node.js/Python/Java workflow examples
 3. ✅ Add "Choosing Metrics" guidance section
 
@@ -281,7 +280,7 @@ The documentation is well-written, detailed, and includes good troubleshooting g
 The git-perf integration was successful despite a few documentation gaps. The integration guide is quite good overall, particularly the troubleshooting and best practices sections.
 
 The main improvement areas are:
-1. **Fix the installation script** (blocking issue)
+1. **Add inline installation examples** (improve tutorial flow)
 2. **Add language-specific examples** (helps adoption)
 3. **Provide metric selection guidance** (reduces guesswork)
 
