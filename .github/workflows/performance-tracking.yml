@@ -27,7 +27,7 @@ jobs:
 
       # Install git-perf
       - name: Install git-perf
-        uses: kaihowl/git-perf/.github/actions/install@master
+        uses: kaihowl/git-perf/.github/actions/install@12-23-fix_use_relative_action_references_for_consistency_across_invoked_actions
         with:
           release: latest
 
@@ -68,7 +68,7 @@ jobs:
 
       # Generate performance report with audit
       - name: Generate performance report
-        uses: kaihowl/git-perf/.github/actions/report@master
+        uses: kaihowl/git-perf/.github/actions/report@12-23-fix_use_relative_action_references_for_consistency_across_invoked_actions
         with:
           depth: 40
           audit-args: '-m build_time -m dist_size -m test_duration -d 4.0 --min-measurements 3'
